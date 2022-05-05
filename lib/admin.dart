@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/orders.dart';
+
 class AdminHome extends StatefulWidget {
   const AdminHome({Key? key}) : super(key: key);
 
@@ -11,6 +13,28 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
+  List<Order> values = [];
+  @override
+  void initState() {
+    super.initState();
+    idk();
+  }
+
+  Future<void> idk() async {
+    var resp = await http.get(
+      Uri.parse("https://aracquine.000webhostapp.com/getAllOrders.php"),
+    );
+    var h = jsonDecode(resp.body);
+    for (int i = 0; i < h.length; i++) {
+      Order order = Order(
+          id: h[i]['order_id'],
+          custId: h[i]['cust_id'],
+          price: h[i]['total_price']);
+      values.add(order);
+    }
+    setState(() {});
+  }
+
   String email = "", password = "";
   @override
   Widget build(BuildContext context) {
@@ -19,6 +43,7 @@ class _AdminHomeState extends State<AdminHome> {
         title: Text("AdminHomePAge"),
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: double.infinity,
@@ -97,6 +122,18 @@ class _AdminHomeState extends State<AdminHome> {
                   });
             },
             child: Text("Add Admin"),
+          ),
+          Flexible(
+            child: ListView.builder(
+              itemCount: values.length,
+              itemBuilder: (context, i) {
+                return ListTile(
+                  leading: Text(values[i].id),
+                  title: Text("Customer ID: " + values[i].custId),
+                  trailing: Text("Price: " + values[i].price),
+                );
+              },
+            ),
           ),
         ],
       ),
