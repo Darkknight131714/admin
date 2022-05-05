@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:admin_panel/sold.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,11 +43,79 @@ class _AdminHomeState extends State<AdminHome> {
       appBar: AppBar(
         title: Text("AdminHomePAge"),
       ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    "Admin",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(color: Color(0xFF1DA1F2)),
+            ),
+            ListTile(
+              title: Text("All Sold"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return SoldScreen(id: "-1");
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: double.infinity,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              String id = "";
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Enter Customer ID"),
+                      content: TextField(
+                        decoration: InputDecoration(hintText: 'Customer Id'),
+                        onChanged: (value) {
+                          id = value;
+                        },
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return SoldScreen(id: id + "a");
+                            }));
+                          },
+                          child: Text("GO"),
+                        ),
+                      ],
+                    );
+                  });
+            },
+            child: Text("See Orders by ID"),
           ),
           ElevatedButton(
             onPressed: () {
@@ -123,14 +192,26 @@ class _AdminHomeState extends State<AdminHome> {
             },
             child: Text("Add Admin"),
           ),
+          Text(
+            "All Orders",
+            style: TextStyle(fontSize: 25),
+          ),
           Flexible(
             child: ListView.builder(
               itemCount: values.length,
               itemBuilder: (context, i) {
-                return ListTile(
-                  leading: Text(values[i].id),
-                  title: Text("Customer ID: " + values[i].custId),
-                  trailing: Text("Price: " + values[i].price),
+                return Card(
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return SoldScreen(id: values[i].id);
+                      }));
+                    },
+                    leading: Text("Order ID:" + values[i].id),
+                    title: Text("Customer ID: " + values[i].custId),
+                    trailing: Text("Price: " + values[i].price),
+                  ),
                 );
               },
             ),
